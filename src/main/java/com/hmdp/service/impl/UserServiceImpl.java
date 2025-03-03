@@ -11,6 +11,8 @@ import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RegexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -29,6 +31,8 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @Override
     public Result sendCode(String phone, HttpSession session) {
         //1判断手机号是否合法
@@ -41,6 +45,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String code = RandomUtil.randomNumbers(6);
         //4保存验证码
         session.setAttribute("code",code);
+
+//        //TODO 4保存验证码到redis ！优化
+//        stringRedisTemplate.opsForValue().set(,code);
+
         //5发送验证码
         log.debug("发送验证码成功,验证码："+code);
         //6返回结果
@@ -71,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         //7保存用户信息到session
         session.setAttribute("user",user);
-        return Result.ok();
+        return Result.ok(session);
     }
 
     private User createUserByPhone(String phone) {
