@@ -33,5 +33,6 @@ class HmDianPingApplicationTests {
         String us = stringRedisTemplate.opsForValue().get("User:100");
         User user1 = objectMapper.readValue(us,User.class);
         System.out.println(user1);
+
     }
 }
