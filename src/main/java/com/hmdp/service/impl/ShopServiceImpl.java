@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.hmdp.utils.RedisConstants.CACHE_SHOP_KEY;
+
 /**
  * <p>
  *  服务实现类
@@ -77,6 +79,20 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         return Result.ok(shop);
     }
 
+    @Override
+    @Transactional
+    public Result update(Shop shop) {
+        Long id = shop.getId();
+        if(id == null){
+            return Result.fail("id不能为空");
+        }
+        //先修改数据库再删除redis数据
+        updateById(shop);
+        stringRedisTemplate.delete(CACHE_SHOP_KEY+id);
+        return Result.ok();
+    }
+
+
     //获取互斥锁
     private Boolean tryLock(String key){
         Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key,"1",50L,TimeUnit.SECONDS);
@@ -86,4 +102,6 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     private void unlock(String key){
         stringRedisTemplate.delete(key);
     }
+
+
 }
