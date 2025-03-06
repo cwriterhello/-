@@ -3,12 +3,14 @@ package com.hmdp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hmdp.entity.User;
+import com.hmdp.service.impl.ShopServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +35,13 @@ class HmDianPingApplicationTests {
         String us = stringRedisTemplate.opsForValue().get("User:100");
         User user1 = objectMapper.readValue(us,User.class);
         System.out.println(user1);
-
     }
+
+    @Resource
+    private ShopServiceImpl service;
+    @Test
+    public void testSaveShop(){
+        service.saveShop2Redis(1L,30L);
+    }
+
 }
